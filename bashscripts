@@ -1,0 +1,6 @@
+for i in `seq 0 5`; do convert -quality 99 -density 600x600 34_$i.pdf
+~/mit/570/34_$i.jpg; done
+
+for i in `seq 0 7`; do python code.py 38_$i.jpg; done
+
+python concatjsondict.py out4.json out38.json > rooms.json
