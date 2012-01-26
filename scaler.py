@@ -79,9 +79,12 @@ h = 6600.0
 scalefactor = 1/1.35
 xc = (x0+x1)/2
 yc = (y0+y1)/2
+yibc = 3056 #centerpoint of building in image
+xibc = w/2
 floorprefix = building + "-"
 floorrange = range(0,int(sys.argv[2]) + 1)
 filename = "out_" + building + "_%d.txt"
+buildingcoords = json.load(open("buildingcoords.json"))[building]
 
 
 #rot = 0
@@ -138,6 +141,16 @@ def outputKml(kmlout, name, gpsx, gpsy):
 def decToE6(dec):
     return int(dec * Decimal(1e6))
 
+centerpoint = (Decimal(0.5), Decimal(0.5))
+
+#shift latlonbox to center on buildingcoords
+xr, yr = rotatePoint((Decimal(xibc) / Decimal(w), Decimal(yibc) / Decimal(h)),
+    centerpoint, rot)
+gpsx = (x1-x0) * xr + x0
+gpsy = (y1-y0) * yr + y0
+dgpsx = Decimal(buildingcoords['lon']) - gpsx
+dgpsy = Decimal(buildingcoords['lat']) - gpsy
+
 roompoints = {}
 
 for line in inlines[:]:
@@ -152,12 +165,11 @@ for line in inlines:
     y = ldata[2]
 #    if x + y != "00":
 #        continue
-    centerpoint = (Decimal(0.5), Decimal(0.5))
     xr, yr = rotatePoint((Decimal(x) / Decimal(w), Decimal(y) / Decimal(h)),
         centerpoint, rot)
     print xr, yr
-    gpsx = (x1-x0) * xr + x0
-    gpsy = (y1-y0) * yr + y0
+    gpsx = (x1-x0) * xr + x0 + dgpsx
+    gpsy = (y1-y0) * yr + y0 + dgpsy
     outputKml(kmlout, room, gpsx, gpsy)
     roompoint = {}
     roompoint['lon'] = decToE6(gpsx)
