@@ -44,7 +44,7 @@ def outputCoords(coords, counter):
         height))
     cv.Copy(region, crop)
     cv.SaveImage("out%d.tiff" % counter, crop)
-    subprocess.call(["tesseract", "out%d.tiff" % counter, "abc", "tessconfig"])
+    subprocess.call(["tesseract", "out%d.tiff" % counter, "abc", "-psm", "8", "tessconfig"])
     subprocess.call(["cat", "abc.txt"])
     roomnumber = open("abc.txt").read().split('\n')
     if len(roomnumber) < 1:
@@ -62,15 +62,19 @@ def outputCoords(coords, counter):
         coords[1] + template.rows / 2))
     return True
 
+dupsfound = 0
+
 for i in range(0,100):
     item = cv.MinMaxLoc(resultmat)
     coords = item[2]
 #    resultmat[coords[1], coords[0]] = maxv
-    setSurroundingPoints(resultmat, coords, 5)
+    setSurroundingPoints(resultmat, coords, 7)
     print item[0]
     print coords
     if not outputCoords(coords, i):
-        break
+        dupsfound += 1
+        if dupsfound > 2:
+            break
     #if item[0] > threshold:
     #    print "done"
     #    break
