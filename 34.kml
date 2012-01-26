@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2" xmlns:kml="http://www.opengis.net/kml/2.2" xmlns:atom="http://www.w3.org/2005/Atom">
+<GroundOverlay>
+	<name>Untitled Image Overlay</name>
+	<color>c9ffffff</color>
+	<Icon>
+		<href>34_2.jpg</href>
+		<viewBoundScale>0.75</viewBoundScale>
+	</Icon>
+	<LatLonBox>
+		<north>42.36167607717397</north>
+		<south>42.36062203498604</south>
+		<east>-71.09094274605059</east>
+		<west>-71.09308527173823</west>
+		<rotation>-63.64948785640581</rotation>
+	</LatLonBox>
+</GroundOverlay>
+</kml>

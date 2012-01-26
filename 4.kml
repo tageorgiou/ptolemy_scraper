@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2" xmlns:kml="http://www.opengis.net/kml/2.2" xmlns:atom="http://www.w3.org/2005/Atom">
+<GroundOverlay>
+	<name>Untitled Image Overlay</name>
+	<Icon>
+		<href>mit/570/4_2.jpg</href>
+		<viewBoundScale>0.75</viewBoundScale>
+	</Icon>
+	<LatLonBox>
+		<north>42.35985824391845</north>
+		<south>42.35875655158723</south>
+		<east>-71.09019908580467</east>
+		<west>-71.09222065156197</west>
+		<rotation>-66.08702527683245</rotation>
+	</LatLonBox>
+</GroundOverlay>
+</kml>
