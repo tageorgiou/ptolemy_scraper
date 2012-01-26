@@ -1,4 +1,3 @@
-from math import sin, cos, pi
 from decimal import Decimal
 import json
 import room_mapping
@@ -7,12 +6,11 @@ import room_mapping
 scalefactor = Decimal(1/1.35)
 
 #xml reader
-from xml.dom import minidom
 import sys
-if len(sys.argv) < 3:
+if len(sys.argv) < 2:
     print """Invalid number of arguments
-    example (building, topfloor):
-    python scaler.py 34 5
+    example (building):
+    python scaler.py 34
     """
     sys.exit(1)
 building = sys.argv[1]
@@ -52,9 +50,9 @@ h = 6600.0
 yibc = 3056 #centerpoint of building in image
 xibc = w/2
 floorprefix = building + "-"
-floorrange = range(0,int(sys.argv[2]) + 1)
+floorrange = range(bottomfloor, topfloor + 1)
 filename = "out_" + building + "_%d.txt"
-buildingcoords = json.load(open("buildingcoords.json"))[building]
+#buildingcoords = json.load(open("buildingcoords.json"))[building]
 mapping = room_mapping.getMapping(building)
 
 
