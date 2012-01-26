@@ -1,6 +1,7 @@
 from math import sin, cos, pi
 from decimal import Decimal
 import json
+import room_mapping
 
 #bldg4
 #y0 = Decimal("42.35985824391845")
@@ -85,6 +86,7 @@ floorprefix = building + "-"
 floorrange = range(0,int(sys.argv[2]) + 1)
 filename = "out_" + building + "_%d.txt"
 buildingcoords = json.load(open("buildingcoords.json"))[building]
+mapping = room_mapping.getMapping(building)
 
 
 #rot = 0
@@ -153,14 +155,15 @@ dgpsy = Decimal(buildingcoords['lat']) - gpsy
 
 roompoints = {}
 
-for line in inlines[:]:
-    inlines.append('3' + line[1::])
-
 for line in inlines:
     ldata = line.split(" ")
     if len(ldata) != 3:
         continue
     room = floorprefix + ldata[0]
+    if not room in mapping.keys():
+        print "%s not found" % room
+        continue
+    roomtype = mapping[room]
     x = ldata[1]
     y = ldata[2]
 #    if x + y != "00":
@@ -180,10 +183,11 @@ for line in inlines:
     except Exception as e:
         pass
     roompoint['floor'] = floor
+    roompoint['type'] = roomtype
     #room = "4-3" + ldata[0][1::]
     roompoints[room] = roompoint
 
-jsonout = open("out.json", "w")
+jsonout = open("out%s.json" % building, "w")
 json.dump(roompoints, jsonout)
 
 kmlout.write("""
