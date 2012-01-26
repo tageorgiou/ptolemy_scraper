@@ -1,0 +1,18 @@
+{
+"_CORRIDOR": "classroom",
+"_ELEVATOR": "elevator",
+"_STAIRWAY": "stairway",
+"MALE LAVATORY": "mtoilet",
+"FEMALE LAVATORY": "ftoilet",
+"LABORATORY SVC": "classroom",
+"LOBBY": "classroom",
+"CLASSROOM": "classroom",
+"CLASSROOM SVC": "classroom",
+"OFFICE": "classroom",
+"RESEARCH LAB": "classroom",
+"_MAIL ROOM": "classroom",
+"SECY/RECEPTION": "classroom",
+"CONFERENCE ROOM": "classroom",
+"TEACHING LAB": "classroom"
+}
+
