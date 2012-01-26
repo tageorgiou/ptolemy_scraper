@@ -3,58 +3,8 @@ from decimal import Decimal
 import json
 import room_mapping
 
-#bldg4
-#y0 = Decimal("42.35985824391845")
-#x1 = Decimal("-71.09019908580467")
-#y1 = Decimal("42.35875655158723")
-#x0 = Decimal("-71.09222065156197")
-#rot = (-66.087025) / 180.0 * pi
-#w = 10200.0
-#h = 6600.0
-#filename = "out.txt"
-#floorprefix = "4-"
-
-#bldg38
-#y0 = Decimal("42.36154159134831")
-#x1 = Decimal("-71.09122827659478")
-#y1 = Decimal("42.36050249583737")
-#x0 = Decimal("-71.09343248293267")
-#rot = (24.6202) / 180.0 * pi
-#w = 10200.0
-#h = 6600.0
-#floorrange = range(0,8)
-#filename = "out_38_%d.txt"
-#floorprefix = "38-"
-
-#bldg34
-#y0 = Decimal("42.36167607717397")
-#x1 = Decimal("-71.09094274605059")
-#y1 = Decimal("42.36062203498604")
-#x0 = Decimal("-71.09308527173823")
-#rot = (-63.64948785640581) / 180.0 * pi
-#w = 10200.0
-#h = 6600.0
-#floorrange = range(0,6)
-#filename = "out_34_%d.txt"
-#floorprefix = "34-"
-#scalefactor = 1/1.35
-#xc = (x0+x1)/2
-#yc = (y0+y1)/2
-
-#bldg36
-#y0 = Decimal("42.36187872652725")
-#x1 = Decimal("-71.09063628209425")
-#y1 = Decimal("42.36089661855554")
-#x0 = Decimal("-71.092667830473")
-#rot = (22.84302980171051) / 180.0 * pi
-#w = 10200.0
-#h = 6600.0
-#floorrange = range(0,10)
-#filename = "out_36_%d.txt"
-#floorprefix = "36-"
-#scalefactor = 1/1.35
-#xc = (x0+x1)/2
-#yc = (y0+y1)/2
+#MIT lat lon scale factor
+scalefactor = Decimal(1/1.35)
 
 #xml reader
 from xml.dom import minidom
@@ -66,20 +16,39 @@ if len(sys.argv) < 3:
     """
     sys.exit(1)
 building = sys.argv[1]
-dom = minidom.parse(open("%s.kml"%building))
-y0 = Decimal(dom.getElementsByTagName("north")[0].firstChild.wholeText)
-x1 = Decimal(dom.getElementsByTagName("east")[0].firstChild.wholeText)
-y1 = Decimal(dom.getElementsByTagName("south")[0].firstChild.wholeText)
-x0 = Decimal(dom.getElementsByTagName("west")[0].firstChild.wholeText)
-rot = \
-        float(Decimal(dom.getElementsByTagName("rotation")[0].firstChild.wholeText)) \
-    / 180.0 * pi
+coordfile = open("coords/%s" % building).read().split("\n")
+bottomfloor,topfloor = map(int, coordfile[0].split(" ")[1:3])
+
+A = map(Decimal, coordfile[1].split(" ")[0].split(","))
+A[1] *= scalefactor
+B = map(Decimal, coordfile[2].split(" ")[0].split(","))
+B[1] *= scalefactor
+U = (B[0]-A[0], B[1]-A[1])
+V = (B[1]-A[1], A[0]-B[0])
+floorMapa = {}
+floorMapb = {}
+for floor in range(bottomfloor, topfloor + 1):
+    la = coordfile[(floor - bottomfloor + 1) * 3 + 1]
+    lb = coordfile[(floor - bottomfloor + 1) * 3 + 2]
+    a = map(Decimal,la.split(","))
+    b = map(Decimal,lb.split(","))
+    floorMapa[floor] = a
+    floorMapb[floor] = b
+
+#sys.exit(1)
+#dom = minidom.parse(open("%s.kml"%building))
+#y0 = Decimal(dom.getElementsByTagName("north")[0].firstChild.wholeText)
+#x1 = Decimal(dom.getElementsByTagName("east")[0].firstChild.wholeText)
+#y1 = Decimal(dom.getElementsByTagName("south")[0].firstChild.wholeText)
+#x0 = Decimal(dom.getElementsByTagName("west")[0].firstChild.wholeText)
+#rot = \
+#        float(Decimal(dom.getElementsByTagName("rotation")[0].firstChild.wholeText)) \
+#    / 180.0 * pi
 
 w = 10200.0
 h = 6600.0
-scalefactor = 1/1.35
-xc = (x0+x1)/2
-yc = (y0+y1)/2
+#xc = (x0+x1)/2
+#yc = (y0+y1)/2
 yibc = 3056 #centerpoint of building in image
 xibc = w/2
 floorprefix = building + "-"
@@ -138,7 +107,7 @@ def outputKml(kmlout, name, gpsx, gpsy):
             <coordinates>%s,%s</coordinates>
         </Point>
     </Placemark>
-    """ % (name, gpsx, gpsy))
+    """ % (name, gpsy, gpsx))
 
 def decToE6(dec):
     return int(dec * Decimal(1e6))
@@ -146,12 +115,20 @@ def decToE6(dec):
 centerpoint = (Decimal(0.5), Decimal(0.5))
 
 #shift latlonbox to center on buildingcoords
-xr, yr = rotatePoint((Decimal(xibc) / Decimal(w), Decimal(yibc) / Decimal(h)),
-    centerpoint, rot)
-gpsx = (x1-x0) * xr + x0
-gpsy = (y1-y0) * yr + y0
-dgpsx = Decimal(buildingcoords['lon']) - gpsx
-dgpsy = Decimal(buildingcoords['lat']) - gpsy
+#xr, yr = rotatePoint((Decimal(xibc) / Decimal(w), Decimal(yibc) / Decimal(h)),
+#    centerpoint, rot)
+#gpsx = (x1-x0) * xr + x0
+#gpsy = (y1-y0) * yr + y0
+#dgpsx = Decimal(buildingcoords['lon']) - gpsx
+#dgpsy = Decimal(buildingcoords['lat']) - gpsy
+
+#Project of a onto b
+def getProjectionC(a,b):
+    #a * b / |b|
+    dp = a[0]*b[0] + a[1]*b[1]
+    ma = (a[0]*a[0] + a[1]*a[1]).sqrt()
+    mb = (b[0]*b[0] + b[1]*b[1]).sqrt()
+    return dp / mb / ma
 
 roompoints = {}
 
@@ -161,27 +138,54 @@ for line in inlines:
         continue
     room = floorprefix + ldata[0]
     if not room in mapping.keys():
-        print "%s not found" % room
+        #print "%s not found" % room
         continue
     roomtype = mapping[room]
-    x = ldata[1]
-    y = ldata[2]
-#    if x + y != "00":
-#        continue
-    xr, yr = rotatePoint((Decimal(x) / Decimal(w), Decimal(y) / Decimal(h)),
-        centerpoint, rot)
-    print xr, yr
-    gpsx = (x1-x0) * xr + x0 + dgpsx
-    gpsy = (y1-y0) * yr + y0 + dgpsy
-    outputKml(kmlout, room, gpsx, gpsy)
-    roompoint = {}
-    roompoint['lon'] = decToE6(gpsx)
-    roompoint['lat'] = decToE6(gpsy)
+    x = Decimal(ldata[1])
+    y = Decimal(ldata[2])
     floor = 0
     try:
         floor = int(ldata[0][0])
     except Exception as e:
         pass
+
+    p = [x,y]
+    fa = floorMapa[floor]
+    fb = floorMapb[floor]
+    fu = (fb[0]-fa[0],fb[1]-fa[1])
+    fv = (fb[1]-fa[1],fa[0]-fb[0])
+    #scale
+    p[0] = p[0] - fa[0]
+    p[1] = p[1] - fa[1]
+#    c1 = getProjectionC(p,fa)
+#    c2 = getProjectionC(p,fb)
+##    c3 = getProjectionC(fb,fa) #linearly dependent
+#    c1a = (c1 * fa[0], c1 * fa[1])
+#    c2 -= getProjectionC(c1a,b)
+#    print c3
+#                  -(by px) + bx py           -(ay px) + ax py
+#Out[5]= {{c1 -> -(----------------), c2 -> -(----------------)}}
+#                  -(ay bx) + ax by            ay bx - ax by
+    c1 = -(-fv[1] * p[0] + fv[0] * p[1]) / (-fu[1] * fv[0] + fu[0] * fv[1])
+    c2 = -(-fu[1] * p[0] + fu[0] * p[1]) / (fu[1] * fv[0] - fu[0] * fv[1])
+
+    print c1,c2
+
+    gpslat = c1 * U[0] + c2 * V[0] + A[0]
+    gpslon = c1 * U[1] + c2 * V[1] + A[1]
+    gpslon /= scalefactor
+    #xr, yr = rotatePoint((Decimal(x) / Decimal(w), Decimal(y) / Decimal(h)),
+    #    centerpoint, rot)
+    #print xr, yr
+    #gpsx = (x1-x0) * xr + x0 + dgpsx
+    #gpsy = (y1-y0) * yr + y0 + dgpsy
+
+    
+
+    outputKml(kmlout, room, gpslat, gpslon)
+    roompoint = {}
+    roompoint['lat'] = decToE6(gpslat)
+    roompoint['lon'] = decToE6(gpslon)
     roompoint['floor'] = floor
     roompoint['type'] = roomtype
     #room = "4-3" + ldata[0][1::]
