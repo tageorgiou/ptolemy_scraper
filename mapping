@@ -1,5 +1,5 @@
 {
-"_CORRIDOR": "classroom",
+"CORRIDOR": "corridor",
 "_ELEVATOR": "elevator",
 "_STAIRWAY": "stairway",
 "MALE LAVATORY": "mtoilet",
@@ -13,6 +13,9 @@
 "_MAIL ROOM": "classroom",
 "SECY/RECEPTION": "classroom",
 "CONFERENCE ROOM": "classroom",
-"TEACHING LAB": "classroom"
+"TEACHING LAB": "classroom",
+"MERCHAND FACIL": "classroom",
+"LOUNGE": "classroom",
+"LECTURE HALL": "classroom"
 }
 
